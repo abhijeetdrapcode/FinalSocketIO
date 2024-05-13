@@ -9,7 +9,7 @@ module.exports = (io) => {
 
     socket.on('clickData', (data) => {
       console.log('Received click data:', data);
-      const req = socket.request; // Get the request object from the socket
+      const req = socket.request;
       clickDataController.saveClickData(data, req);
     });
   });

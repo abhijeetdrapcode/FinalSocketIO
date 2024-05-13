@@ -1,6 +1,5 @@
 const mongoose = require('mongoose');
 
-// Define MongoDB schema
 const clickDataSchema = new mongoose.Schema({
   tag: String,
   text: String,
@@ -11,7 +10,7 @@ const clickDataSchema = new mongoose.Schema({
   localStorageData: Object,
 });
 
-// Create MongoDB model
+
 const ClickData = mongoose.model('ClickData', clickDataSchema);
 
 module.exports = ClickData;
