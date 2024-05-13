@@ -1,17 +1,15 @@
 const socket = io('http://localhost:3000', { transports: ['websocket'] });
 
-// Emit click data on the entire document
 document.addEventListener('click', async (event) => {
     const data = {
         tag: event.target.tagName.toLowerCase(),
         text: event.target.innerText,
         id: event.target.id,
         class: event.target.className,
-        headers: Object.fromEntries([...new Headers(window.navigator).entries()]), // Convert Headers to object
+        headers: Object.fromEntries([...new Headers(window.navigator).entries()]),
         localStorageData: getLocalStorageData(),
     };
 
-    // Fetch and add IP address
     try {
         const ipAddress = await fetchIPAddress();
         data.ipAddress = ipAddress;
@@ -20,7 +18,6 @@ document.addEventListener('click', async (event) => {
         data.ipAddress = '';
     }
 
-    // Emit data to the server
     socket.emit('clickData', data);
 });
 
