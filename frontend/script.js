@@ -27,6 +27,35 @@ function emitClickData(eventType, selector) {
   });
 }
 
+
+function emitClickDataByIdOrClass(eventType, idOrClass) {
+    const elements = document.querySelectorAll(`[id="${idOrClass}"], .${idOrClass}`);
+  
+    elements.forEach(element => {
+      element.addEventListener(eventType, async (event) => {
+        const data = {
+          tag: event.target.tagName.toLowerCase(),
+          text: event.target.innerText,
+          id: event.target.id,
+          class: event.target.className,
+          headers: Object.fromEntries([...new Headers(window.navigator).entries()]),
+          localStorageData: getLocalStorageData(),
+        };
+  
+        try {
+          const ipAddress = await fetchIPAddress();
+          data.ipAddress = ipAddress;
+        } catch (error) {
+          console.error('Error fetching IP address:', error);
+          data.ipAddress = '';
+        }
+  
+        socket.emit('clickData', data);
+      });
+    });
+  }
+
+
 function getLocalStorageData() {
   const data = {};
   for (let i = 0; i < localStorage.length; i++) {
@@ -60,14 +89,11 @@ socket.on('clickDataSaved', (payload) => {
   });
 
 
-emitClickData('click', 'button');
-
+emitClickData('click', 'Testing1');
 // emitClickData('click', 'p');
+// emitClickData('click','a');
+// emitClickData('click', 'h1');
 
-emitClickData('click','a');
+emitClickDataByIdOrClass('click', 'display-4    ');
 
-emitClickData('click', 'h1');
-
-
-
-
+emitClickDataByIdOrClass('click', 'form-control');
