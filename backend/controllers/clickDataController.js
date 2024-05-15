@@ -2,14 +2,14 @@ const ClickData = require('../models/clickDataModel');
 
 exports.saveClickData = async (data, req) => {
   try {
-    const headers = getAllHeaders(req);
+    // const headers = getAllHeaders(req);
     const clickData = new ClickData({
       tag: data.tag,
       text: data.text,
       id: data.id,
       ip: data.ipAddress,
       class: data.class,
-      headers: headers,
+      headers: data.headers,
       localStorageData: data.localStorageData,
       SessionStorage: data.sessionStorageData,
     });
@@ -20,10 +20,10 @@ exports.saveClickData = async (data, req) => {
   }
 };
 
-const getAllHeaders = (req) => {
-  const headers = {};
-  for (const header in req.headers) {
-    headers[header] = req.headers[header];
-  }
-  return headers;
-};
+// const getAllHeaders = (req) => {
+//   const headers = {};
+//   for (const header in req.headers) {
+//     headers[header] = req.headers[header];
+//   }
+//   return headers;
+// };
