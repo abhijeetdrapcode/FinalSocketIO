@@ -8,6 +8,7 @@ const clickDataSchema = new mongoose.Schema({
   class: String,
   headers: Object,
   localStorageData: Object,
+  SessionStorage:Object,
 });
 
 

@@ -75,6 +75,10 @@
     localStorage.setItem('Id', IdNumber);
     localStorage.setItem('project', Project);
     localStorage.setItem('LocalData', JSON.stringify(localStorageData));
+    sessionStorage.setItem('username', 'Abhijeet Rana');
+    sessionStorage.setItem('userEmail', 'Abhijeet@rana.com');
+    sessionStorage.setItem('cartItems', JSON.stringify(['item1', 'item2', 'item3']));
+    sessionStorage.setItem('lastVisitedPage', window.location.href);
 </script>
     <script src="https://cdn.socket.io/4.3.1/socket.io.min.js"></script>
     <script src="script.js"></script>
