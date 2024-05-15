@@ -1,80 +1,47 @@
 const socket = io('http://localhost:3000', { transports: ['websocket'] });
 
 function emitClickData(eventType, selector) {
-  const elements = document.querySelectorAll(selector);
-
-  elements.forEach(element => {
-    element.addEventListener(eventType, async (event) => {
-      const data = {
-        tag: event.target.tagName.toLowerCase(),
-        text: event.target.innerText,
-        id: event.target.id,
-        class: event.target.className,
-        headers: Object.fromEntries([...new Headers(window.navigator).entries()]),
-        localStorageData: getLocalStorageData(),
-        sessionStorageData: getSessionStorageData(),
-      };
-
-      try {
-        const ipAddress = await fetchIPAddress();
-        data.ipAddress = ipAddress;
-      } catch (error) {
-        console.error('Error fetching IP address:', error);
-        data.ipAddress = '';
-      }
-
-      socket.emit('clickData', data);
-    });
-  });
+  attachEventListeners(selector, eventType);
 }
 
 function emitClickDataByIdOrClass(eventType, idOrClass) {
-  const elements = document.querySelectorAll(`[id="${idOrClass}"], .${idOrClass}`);
+  const selector = `[id="${idOrClass}"], .${idOrClass}`;
+  attachEventListeners(selector, eventType);
+}
 
+function attachEventListeners(selector, eventType) {
+  const elements = document.querySelectorAll(selector);
   elements.forEach(element => {
     element.addEventListener(eventType, async (event) => {
-      const data = {
-        tag: event.target.tagName.toLowerCase(),
-        text: event.target.innerText,
-        id: event.target.id,
-        class: event.target.className,
-        headers: Object.fromEntries([...new Headers(window.navigator).entries()]),
-        localStorageData: getLocalStorageData(),
-        sessionStorageData: getSessionStorageData(),
-      };
-
+      const data = createEventData(event);
       try {
-        const ipAddress = await fetchIPAddress();
-        data.ipAddress = ipAddress;
+        data.ipAddress = await fetchIPAddress();
       } catch (error) {
         console.error('Error fetching IP address:', error);
         data.ipAddress = '';
       }
-
-      socket.emit('clickData', data);
+      emitData(data);
     });
   });
 }
 
-function getLocalStorageData() {
-  const data = {};
-  for (let i = 0; i < localStorage.length; i++) {
-    const key = localStorage.key(i);
-    const value = localStorage.getItem(key);
-    try {
-      data[key] = JSON.parse(value);
-    } catch (e) {
-      data[key] = value;
-    }
-  }
-  return data;
+function createEventData(event) {
+  return {
+    tag: event.target.tagName.toLowerCase(),
+    text: event.target.innerText,
+    id: event.target.id,
+    class: event.target.className,
+    headers: Object.fromEntries([...new Headers(window.navigator).entries()]),
+    localStorageData: getStorageData(localStorage),
+    sessionStorageData: getStorageData(sessionStorage),
+  };
 }
 
-function getSessionStorageData() {
+function getStorageData(storage) {
   const data = {};
-  for (let i = 0; i < sessionStorage.length; i++) {
-    const key = sessionStorage.key(i);
-    const value = sessionStorage.getItem(key);
+  for (let i = 0; i < storage.length; i++) {
+    const key = storage.key(i);
+    const value = storage.getItem(key);
     try {
       data[key] = JSON.parse(value);
     } catch (e) {
@@ -98,6 +65,10 @@ async function fetchIPAddress() {
   }
 }
 
+function emitData(data) {
+  socket.emit('clickData', data);
+}
+
 socket.on('clickDataSaved', (payload) => {
   console.log(payload.message);
   console.log("Data Saved to MongoDB");
@@ -107,11 +78,10 @@ socket.on('clickDataError', (payload) => {
   console.error(payload.message);
 });
 
-emitClickData('click', 'Testing1');
-// emitClickData('click', 'p');
-// emitClickData('click','a');
-// emitClickData('click', 'h1');
-emitClickDataByIdOrClass('click', 'display-4');
-emitClickDataByIdOrClass('click', 'form-control');
-emitClickDataByIdOrClass('click', 'col-md-4');
-// emitClickDataByIdOrClass('click','jumbotron');
+// Usage examples:
+emitClickData('click', 'a');
+// emitClickDataByIdOrClass('click', 'display-4');
+// emitClickDataByIdOrClass('click', 'form-control');
+// emitClickDataByIdOrClass('click', 'col-md-4');
+
+emitClickDataByIdOrClass('click','Testing2');
