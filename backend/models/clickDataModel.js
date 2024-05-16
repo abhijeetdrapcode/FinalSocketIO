@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 
 const clickDataSchema = new mongoose.Schema({
+  eventName:String,
   tag: String,
   text: String,
   id: String,

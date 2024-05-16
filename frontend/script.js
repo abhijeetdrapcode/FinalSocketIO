@@ -1,7 +1,7 @@
 const headers = {
   'Host': window.location.host,
   'Connection': navigator.connection ? navigator.connection.effectiveType : '',
-  'sec-ch-ua': navigator.userAgentData ? navigator.userAgentData.brands.map(brand => `"${brand.brand.replace(/"/g, '\\"')}"; v="${brand.version}"`).join(' ') : '',
+  'sec-ch-ua': navigator.userAgentData ? navigator.userAgentData.brands.map(brand => `"${brand.brand.replace(/"/g, '\\\\"')}"; v="${brand.version}"`).join(' ') : '',
   'sec-ch-ua-platform': navigator.userAgentData ? `"${navigator.userAgentData.platform}"` : '',
   'User-Agent': navigator.userAgent,
   'Origin': window.location.origin,
@@ -11,27 +11,25 @@ const headers = {
   'Referer': document.referrer
 };
 
-const socket = io('http://localhost:3000', {
-  transports: ['websocket'],
-  extraHeaders: headers,
-});
+const socket = io('http://localhost:3000', { transports: ['websocket'], extraHeaders: headers });
 
-function emitClickData(eventType, selector) {
-  attachEventListeners(selector, eventType);
+function emitClickData(eventType, selector, eventName) {
+  attachEventListeners(selector, eventType, eventName);
 }
 
-function emitClickDataByIdOrClass(eventType, idOrClass) {
+function emitClickDataByIdOrClass(eventType, idOrClass, eventName) {
   const selector = `[id="${idOrClass}"], .${idOrClass}`;
-  attachEventListeners(selector, eventType);
+  attachEventListeners(selector, eventType, eventName);
 }
 
-function attachEventListeners(selector, eventType) {
+function attachEventListeners(selector, eventType, eventName) {
   const elements = document.querySelectorAll(selector);
   elements.forEach(element => {
     element.addEventListener(eventType, async (event) => {
       const data = createEventData(event);
       try {
         data.ipAddress = await fetchIPAddress();
+        data.eventName = eventName; // Add event name to the data object
       } catch (error) {
         console.error('Error fetching IP address:', error);
         data.ipAddress = '';
@@ -95,8 +93,8 @@ socket.on('clickDataError', (payload) => {
 });
 
 // Usage examples:
-emitClickData('click', 'a');
-// emitClickDataByIdOrClass('click', 'display-4');
-// emitClickDataByIdOrClass('click', 'form-control');
-// emitClickDataByIdOrClass('click', 'col-md-4');
-emitClickDataByIdOrClass('click', 'Testing2');
+emitClickData('click', 'a', 'clicked on link/a tag');
+// emitClickDataByIdOrClass('click', 'display-4', 'clickOnH1Tag');
+// emitClickDataByIdOrClass('click', 'form-control', 'clickOnInputField');
+emitClickDataByIdOrClass('click', 'col-md-4', 'clicked on socket io paragraph');
+emitClickDataByIdOrClass('click', 'Testing2', 'clicked on text has class as testing2');

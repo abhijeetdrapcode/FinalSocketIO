@@ -4,6 +4,7 @@ exports.saveClickData = async (data, req) => {
   try {
     // const headers = getAllHeaders(req);
     const clickData = new ClickData({
+      eventName: data.eventName,
       tag: data.tag,
       text: data.text,
       id: data.id,
